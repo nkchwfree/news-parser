@@ -30,18 +30,16 @@ client.query(
     	            parse_one_page(row.html_content, this.callback);
     	        },
     	        'content':function(error, match){
-    	            assert.equal(match.content, row.content);
+    	            assert.equal(match.content, row.content, row.url);
     	        },
     	        'title':function(error, match){
-    	            //assert.equal(match.title, row.title);
+    	            //assert.equal(match.title, row.title, row.url);
     	        }
     	    };
             parser.addBatch(obj);
         });
 
         parser.export(module);
-
-        //process.exit();
     }
 );
 
