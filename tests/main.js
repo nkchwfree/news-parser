@@ -14,11 +14,6 @@ var parse_one_page = function(content, cb){
 
 var parser = vows.describe('Parser');
 
-var parsePage = [
-	['qq1', '去年汽车销量增幅创13年新低 政策退潮致销量下滑', '']
-];
-
-
 client.query(
     "select * FROM test_case order by id asc",
     function(error, results, fields) {
@@ -27,22 +22,26 @@ client.query(
             return;
         }
 
-        _.each(results,function(row){
+        _.each(results,function(row, key){
             //console.log(row);
-            parser.addBatch({
-        	    "文章页面":{
-        	        topic:function(){
-        	            parse_one_page(row.html_content, this.callback);
-        	        },
-        	        '解析内容':function(error, match){
-        	            assert.equal(match.title, row.title);
-        	            assert.equal(match.content, row.content);
-        	        }
-        	    }
-            })
+            var obj = {};
+            obj[row.id] = {
+    	        topic:function(){
+    	            parse_one_page(row.html_content, this.callback);
+    	        },
+    	        'content':function(error, match){
+    	            assert.equal(match.content, row.content);
+    	        },
+    	        'title':function(error, match){
+    	            //assert.equal(match.title, row.title);
+    	        }
+    	    };
+            parser.addBatch(obj);
         });
 
         parser.export(module);
+
+        //process.exit();
     }
 );
 

@@ -11,6 +11,7 @@ request({ 'url' : url, 'encoding' : 'binary', 'timeout' : 50000 }, function(erro
     else {
         var parser = require("./lib/parser").parser;
         parser(body, data, function(error, match){
+            console.log(match.content);
             console.log(match);
         });
     }
