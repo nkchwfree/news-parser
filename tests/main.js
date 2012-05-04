@@ -40,6 +40,7 @@ client.query(
         });
 
         parser.export(module);
+        client.end();
     }
 );
 
