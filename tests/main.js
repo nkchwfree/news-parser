@@ -28,12 +28,13 @@ client.query(
             obj[row.id] = {
     	        topic:function(){
     	            parse_one_page(row.html_content, this.callback);
+    	            //console.log(row.url);
     	        },
     	        'content':function(error, match){
     	            assert.equal(match.content, row.content);
     	        },
     	        'title':function(error, match){
-    	            //assert.equal(match.title, row.title, row.url);
+    	            assert.equal(match.title, row.title);
     	        }
     	    };
             parser.addBatch(obj);
