@@ -18,7 +18,7 @@ if($strategy=='default') {
       );
     $tidy = new tidy();
 
-    if(preg_match('#charset=([-a-z0-9]+)#msi', $buffer, $match)) {
+    if(preg_match('#charset=([-a-z0-9]+)#msi', $buffer, $match) || preg_match('#charset="([-a-z0-9]+)"#msi', $buffer, $match)) {
         if(strtoupper($match[1])!='UTF-8') {
             if(strtoupper($match[1])=='GB2312') {
                 $match[1] = 'GB18030';
