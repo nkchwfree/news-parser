@@ -30,7 +30,7 @@ client.query(
     	            parse_one_page(row.html_content, this.callback);
     	        },
     	        'content':function(error, match){
-    	            assert.equal(match.content, row.content, row.url);
+    	            assert.equal(match.content, row.content);
     	        },
     	        'title':function(error, match){
     	            //assert.equal(match.title, row.title, row.url);
