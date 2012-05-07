@@ -32,8 +32,8 @@ else {
                     console.log(match.title);
                     console.log('---------------------');
                     console.log(match.content);
-                    console.log('---------------------');
-                    console.log(match);
+                    //console.log('---------------------');
+                    //console.log(match);
 
                     //添加到测试用例中
                     if(argv.add=="1") {
