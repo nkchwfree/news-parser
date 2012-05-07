@@ -7,6 +7,7 @@ if($strategy=='default') {
 
     $tidy_options = array(
         'input-xml'    => false,
+        "doctype" => "omit",
         'output-xml'   => true,
         'indent'       => true,
         'wrap'         => false,
