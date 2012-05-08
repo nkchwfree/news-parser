@@ -12,9 +12,9 @@ if($strategy=='default') {
         'indent'       => true,
         'wrap'         => false,
         'hide-comments' => true,
-        'drop-font-tags' => false,
+        'drop-font-tags' => true,
         'drop-empty-paras' => true,
-        "logical-emphasis" => false,
+        "logical-emphasis" => true,
         'escape-cdata'  => true
       );
     $tidy = new tidy();
