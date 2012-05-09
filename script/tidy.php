@@ -2,7 +2,7 @@
 
 $strategy = $argv[1];
 $buffer = file_get_contents('php://stdin');
-
+//echo 1;
 if($strategy=='default') {
 
     $tidy_options = array(

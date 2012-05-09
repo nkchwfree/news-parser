@@ -9,8 +9,8 @@ var redis = require('../lib/redis').redis;
 
 var parse_one_page = function(content, cb){
     //console.log(content);
-    var parser = require("../lib/parser").parser;
-    parser(content, {}, cb);
+    var parseDetail = require("../lib/parser").parseDetail;
+    parseDetail(content, {}, cb);
 };
 
 var parser = vows.describe('Parser');
