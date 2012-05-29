@@ -1,33 +1,29 @@
 var assert = require('assert');
 var fs =  require('fs');
 var vows = require('vows');
-var mysql = require('mysql');
-var config = require('../config/config').config;
-
-config.mysql.charset = "UTF8";
-var client = mysql.createConnection( config.mysql );
 var _ = require('underscore');
 
 var parse_one_page = function(content, cb){
-    //console.log(content);
-    //var parser = require("../lib/parser").parser;
-    //parser(content, {}, cb);
     var parseDetail = require("../lib/parser").parseDetail;
     parseDetail(content, {}, cb);
 };
 
 var parser = vows.describe('Parser');
 
-client.query(
-    "select * FROM test_case order by id asc",
-    function(error, results, fields) {
+
+var newClient = require('../lib/db_mysql').newClient;
+
+newClient(function(client){
+    client.query("select * FROM test_case order by id asc").execute(function(error, rows, cols) {
         if (error) {
-            console.log(error);
+            console.log('ERROR: ' + error);
             return;
         }
+        console.log(rows.length + ' ROWS found');
 
-        _.each(results,function(row, key){
+        _.each(rows,function(row, key){
             //console.log(row.html_content.toString());
+            //return;
             var obj = {};
             obj[row.id] = {
     	        topic:function(){
@@ -45,9 +41,8 @@ client.query(
         });
 
         parser.export(module);
-        client.end();
-    }
-);
+    });
+});
 
 
 

@@ -15,16 +15,20 @@ else {
 
         //添加到测试用例中
         if(argv.add=="1") {
-            var mysql = require('mysql');
-            var config = require('./config/config').config;
-            var client = mysql.createConnection( config.mysql );
-            client.query(
-                "INSERT INTO test_case SET url = ?, content = ?, html_content = ?, title = ?", [url,data.content, data.html, data.title],
-                function(error, results, fields) {
-                    console.log(error);
-                    client.end();
-                }
-            );
+            var newClient = require('./lib/db_mysql').newClient;
+            newClient(function(client){
+                client.query().insert('test_case',
+                    ['url', 'content', 'html_content', 'title'],
+                    [{value:url,escape:true}, {value:data.content, escape:true}, {value:data.html, escape:true}, {value:data.title, escape:true}]
+                ).execute(function(error, result) {
+                    if (error) {
+                        console.log('ERROR: ' + error);
+                        return;
+                    }
+                    console.log('GENERATED id: ' + result.id);
+                    client.disconnect();
+                });
+            });
         }
     });
 }
