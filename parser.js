@@ -15,9 +15,16 @@ else {
 
         //添加到测试用例中
         if(argv.add=="1") {
-            var redis = require('./lib/redis').redis;
-            redis.HMSET("test_case", url, JSON.stringify(data));
-            redis.quit();
+            var mysql = require('mysql');
+            var config = require('./config/config').config;
+            var client = mysql.createConnection( config.mysql );
+            client.query(
+                "INSERT INTO test_case SET url = ?, content = ?, html_content = ?, title = ?", [url,data.content, data.html, data.title],
+                function(error, results, fields) {
+                    console.log(error);
+                    client.end();
+                }
+            );
         }
     });
 }
