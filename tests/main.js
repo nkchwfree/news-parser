@@ -1,9 +1,6 @@
 var assert = require('assert');
-var fs =  require('fs');
 var vows = require('vows');
-var mysql = require('mysql');
 var config = require('../config/config').config;
-var _ = require('underscore');
 var redis = require('../lib/redis').redis;
 
 var parse_one_page = function(content, cb){
