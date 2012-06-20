@@ -1,6 +1,43 @@
 var exec = require('child_process').exec;
 var config = require('../config/config').config;
 
+function getWindow(content, cb) {
+
+    var strategy = 'default';
+
+    content = content.replace(/<\/(strong|em|i|font)>/g,'').replace(/<(strong|em|i|font)( +[^<>]*)?>/g,'');
+    content = content.replace(/document.write(ln)?\('<script /g,'');
+
+    var match;
+    var encoding = "binary";
+    if(match = content.match(/charset=(utf-8)/i)) {
+        //encoding = 'utf8';//match[1];
+    }
+    //console.log(encoding);
+    var buffer = new Buffer(content, encoding);
+    exec(config.php+' '+__dirname+'/../script/tidy.php '+strategy, {maxBuffer:1024*1024},function(error, body, stderr){
+        if ( !error ) {
+            //console.log(body);
+            //body = body.replace(/document.writeln\('<script /g,'');
+            //return;
+            var jsdom = require('jsdom');
+            jsdom.env(body, [__dirname+'/../script/jquery-1.7.2.min.js'], function(errors, window) {
+                if( errors ){
+                    //console.log('jsdom-error:'+errors);
+                    cb('jsdom-error:'+errors);
+                }
+                else {
+                    window.__stopAllTimers();
+                    cb(null, window);
+                }
+            });
+        }
+        else {
+          cb('tidy-error:'+error);
+        }
+    }).stdin.end( buffer );
+}
+
 process.on('message', function(data) {
     //子进程的内存限制默认是64M。
     var memory_limit = config[memory_limit]||64;
@@ -8,34 +45,22 @@ process.on('message', function(data) {
         process.exit();
     }
 
-    //获取tidy的处理策略
-    var strategy = config.tidy_strategy[data.data.site+'.'+data.data.type] || 'default';
+    getWindow(data.data.content, function(error, window){
+        if (error) {
+            //console.log(error);
+            process.send( { 'key': data.key, 'error': error } );
+            return;
+        }
 
-    //调用tidy允许使用的内存限制，默认是2M。
-    var max_buffer = config.max_buffer||2;
-    exec(config.php+' '+__dirname+'/tidy.php '+ strategy, {maxBuffer:max_buffer*1024*1024}, function(error, body, stderr){
-        if ( !error ) {
-            var jsdom = require('jsdom');
-            jsdom.env(body, [__dirname+'/jquery-1.7.1.min.js'], function(errors, window) {
-                if( errors ){
-                    process.send( { 'key': data.key, 'error': errors } );
-                } else {
-                    window.__stopAllTimers();
-
-                    try {
-                        var parser = require('../lib/matcher/'+data.data.site+'.'+data.data.type);
-                        parser.parse( window, data.data, function( error, match ){
-                            process.send( { 'key': data.key, 'data': match, 'error': error } );
-                        });
-                    }
-                    catch(e) {
-                        console.log(e);
-                    }
-                }
+        try {
+            var matcher = require('../lib/'+ data.data.matcher);
+            matcher.match( window, data.data, function(err, match){
+                process.send( { 'key': data.key, 'data': match, 'error': err } );
             });
         }
-        else {
-            process.send( { 'key': data.key, 'error': 'tidy-error '+error } );
+        catch(e) {
+            console.log(e);
+            process.send( { 'key': data.key, 'error': e.toString() } );
         }
-    }).stdin.end( data.data.text, 'binary' );
+    });
 });

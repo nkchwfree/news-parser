@@ -7,6 +7,6 @@ exports.list = [
     {
         name:'腾讯-股票-上市公司'
         url:'http://finance.qq.com/l/stock/shsgs/index.htm',
-        path:'.newslist a'
+        path:".newslist a"
     }
 ];
